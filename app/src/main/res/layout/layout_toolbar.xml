@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/toolbar"
+    android:layout_width="match_parent"
+    android:layout_height="55dp"
+    android:background="@color/colorYellow">
+
+    <ImageView
+        android:id="@+id/iv_backPressed"
+        android:layout_width="22dp"
+        android:layout_height="22dp"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="15dp"
+        android:src="@mipmap/bac_pressed"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/colorWhite"
+        android:layout_centerInParent="true"
+        android:textSize="22sp"
+        android:text="扫一扫"/>
+
+
+    <ImageView
+        android:id="@+id/iv_albumh"
+        android:layout_width="25dp"
+        android:layout_height="22dp"
+        android:layout_centerVertical="true"
+        android:layout_toLeftOf="@id/iv_lamp"
+        android:layout_marginRight="15dp"
+        android:src="@mipmap/album"/>
+
+
+    <ImageView
+        android:id="@+id/iv_lamp"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_centerVertical="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="15dp"
+        android:src="@mipmap/flash_lamp"/>
+
+</RelativeLayout>

@@ -1,0 +1,19 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".MainActivity">
+
+
+    <item
+        android:id="@+id/action_albumh"
+        android:icon="@mipmap/album"
+        android:title="Search"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_lamp"
+        android:icon="@mipmap/flash_lamp"
+        android:title="notifications"
+        app:showAsAction="ifRoom" />
+
+</menu>

@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">OCR_VIN_WorkDemo2018_6_1</string>
+    <string name="camera_permission_required">本功能需要相机权限！</string>
+
+    <string name="idCardLabel">身份证识别</string>
+    <string name="bankCardLabel">银行卡识别</string>
+    <string name="generalLabel">通用文字识别</string>
+</resources>
