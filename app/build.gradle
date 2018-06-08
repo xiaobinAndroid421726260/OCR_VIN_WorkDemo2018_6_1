@@ -28,6 +28,9 @@ dependencies {
     implementation files('libs/ocr-sdk.jar')
     implementation files('libs/license.jar')
 
+    implementation 'com.android.support:design:27.1.1'
+    implementation 'com.android.support:recyclerview-v7:27.1.1'
+
     // Android从4.4沉浸式状态栏(SystemBarTintManager)
     implementation 'com.readystatesoftware.systembartint:systembartint:1.0.3'
 }

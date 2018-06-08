@@ -12,7 +12,7 @@
 
     <item
         android:id="@+id/action_lamp"
-        android:icon="@mipmap/flash_lamp"
+        android:icon="@mipmap/bd_ocr_light_off"
         android:title="notifications"
         app:showAsAction="ifRoom" />
 

@@ -19,6 +19,11 @@
         android:paddingRight="@dimen/activity_horizontal_margin"
         android:paddingTop="@dimen/activity_vertical_margin">
 
+        <ImageView
+            android:id="@+id/img"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
         <Button
             android:id="@+id/general_basic_button"
             android:layout_width="match_parent"
@@ -26,61 +31,61 @@
             android:text="通用文字识别"
             tools:ignore="HardcodedText" />
 
-        <Button
-            android:id="@+id/accurate_basic_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="通用文字识别(高精度版)"
-            tools:ignore="HardcodedText" />
+        <!--<Button-->
+            <!--android:id="@+id/accurate_basic_button"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="通用文字识别(高精度版)"-->
+            <!--tools:ignore="HardcodedText" />-->
 
-        <Button
-            android:id="@+id/general_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="通用文字识别（含位置信息版）"
-            tools:ignore="HardcodedText" />
+        <!--<Button-->
+            <!--android:id="@+id/general_button"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="通用文字识别（含位置信息版）"-->
+            <!--tools:ignore="HardcodedText" />-->
 
-        <Button
-            android:id="@+id/accurate_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="通用文字识别(高精度含位置信息版)"
-            tools:ignore="HardcodedText" />
+        <!--<Button-->
+            <!--android:id="@+id/accurate_button"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="通用文字识别(高精度含位置信息版)"-->
+            <!--tools:ignore="HardcodedText" />-->
 
-        <Button
-            android:id="@+id/general_enhance_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="通用文字识别（含生僻字版）"
-            tools:ignore="HardcodedText" />
+        <!--<Button-->
+            <!--android:id="@+id/general_enhance_button"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="通用文字识别（含生僻字版）"-->
+            <!--tools:ignore="HardcodedText" />-->
 
-        <Button
-            android:id="@+id/general_webimage_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="网络图片文字识别"
-            tools:ignore="HardcodedText" />
+        <!--<Button-->
+            <!--android:id="@+id/general_webimage_button"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="网络图片文字识别"-->
+            <!--tools:ignore="HardcodedText" />-->
 
-        <Button
-            android:id="@+id/idcard_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="身份证识别"
-            tools:ignore="HardcodedText" />
+        <!--<Button-->
+            <!--android:id="@+id/idcard_button"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="身份证识别"-->
+            <!--tools:ignore="HardcodedText" />-->
 
-        <Button
-            android:id="@+id/bankcard_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="银行卡识别"
-            tools:ignore="HardcodedText" />
+        <!--<Button-->
+            <!--android:id="@+id/bankcard_button"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="银行卡识别"-->
+            <!--tools:ignore="HardcodedText" />-->
 
-        <Button
-            android:id="@+id/driving_license_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="驾驶证识别"
-            tools:ignore="HardcodedText" />
+        <!--<Button-->
+            <!--android:id="@+id/driving_license_button"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="驾驶证识别"-->
+            <!--tools:ignore="HardcodedText" />-->
 
         <Button
             android:id="@+id/vehicle_license_button"
@@ -89,19 +94,19 @@
             android:text="行驶证识别"
             tools:ignore="HardcodedText" />
 
-        <Button
-            android:id="@+id/license_plate_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="车牌识别"
-            tools:ignore="HardcodedText" />
+        <!--<Button-->
+            <!--android:id="@+id/license_plate_button"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="车牌识别"-->
+            <!--tools:ignore="HardcodedText" />-->
 
-        <Button
-            android:id="@+id/business_license_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="营业执照识别"
-            tools:ignore="HardcodedText" />
+        <!--<Button-->
+            <!--android:id="@+id/business_license_button"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="营业执照识别"-->
+            <!--tools:ignore="HardcodedText" />-->
 
         <Button
             android:id="@+id/receipt_button"
@@ -166,6 +171,6 @@
                 tools:ignore="HardcodedText" />
         </LinearLayout>
 
-
     </LinearLayout>
+
 </ScrollView>

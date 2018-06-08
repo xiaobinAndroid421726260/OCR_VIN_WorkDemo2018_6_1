@@ -4,6 +4,7 @@
 package com.example.ocr;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.baidu.ocr.sdk.OCR;
 import com.baidu.ocr.sdk.OnResultListener;
@@ -27,7 +28,7 @@ import java.io.File;
 public class RecognizeService {
 
     interface ServiceListener {
-        public void onResult(String result);
+        void onResult(String result);
     }
 
     public static void recGeneral(Context ctx, String filePath, final ServiceListener listener) {
@@ -117,9 +118,12 @@ public class RecognizeService {
                 for (WordSimple wordSimple : result.getWordList()) {
                     WordSimple word = wordSimple;
                     sb.append(word.getWords());
-                    sb.append("\n");
+//                    sb.append("\n");
                 }
-                listener.onResult(result.getJsonRes());
+                Log.e("CameraActivity = ", sb.toString());
+//                listener.onResult(result.getJsonRes());
+                listener.onResult(sb.toString());
+                Log.e("CameraActivity = ", result.getJsonRes());
             }
 
             @Override

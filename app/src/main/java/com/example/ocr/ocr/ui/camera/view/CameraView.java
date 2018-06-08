@@ -22,6 +22,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.example.ocr.ImageUtils;
 import com.example.ocr.R;
 import com.example.ocr.ocr.idcardquality.IDcardQualityProcess;
 import com.example.ocr.ocr.ui.camera.Camera1Control;
@@ -518,8 +519,6 @@ public class CameraView extends FrameLayout {
 
             // BitmapRegionDecoder不会将整个图片加载到内存。
             BitmapRegionDecoder decoder = BitmapRegionDecoder.newInstance(data, 0, data.length, true);
-
-
 
             int width = rotation % 180 == 0 ? decoder.getWidth() : decoder.getHeight();
             int height = rotation % 180 == 0 ? decoder.getHeight() : decoder.getWidth();

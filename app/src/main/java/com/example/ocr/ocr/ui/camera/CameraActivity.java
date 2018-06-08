@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
@@ -15,17 +16,22 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AppCompatDelegate;
-import android.support.v7.widget.Toolbar;
+import android.support.v7.app.AppCompatActivity;
+import android.text.TextPaint;
 import android.util.Log;
 import android.view.Surface;
 import android.view.View;
-import android.view.Window;
 import android.view.WindowManager;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.ocr.ImageUtils;
 import com.example.ocr.R;
 import com.example.ocr.ocr.idcardquality.IDcardQualityProcess;
 import com.example.ocr.ocr.ui.camera.view.CameraView;
@@ -64,18 +70,24 @@ public class CameraActivity extends Activity {
     private boolean isNativeEnable;
     private boolean isNativeManual;
 
-    private OCRCameraLayout takePictureContainer;
     private OCRCameraLayout cropContainer;
+    //    private OCRCameraLayout takePictureContainer;
+    private RelativeLayout takePictureContainer;
     private OCRCameraLayout confirmResultContainer;
-    private ImageView lightButton;
+    private ImageView lightButton; // 闪光灯
     private CameraView cameraView;
     private ImageView displayImageView;
     private CropView cropView;
     private FrameOverlayView overlayView;
     private MaskView cropMaskView;
-    private ImageView takePhotoBtn;
+    //    private ImageView takePhotoBtn;
+    private TextView takePhotoBtn; // 拍照
 
-    private View layoutTitleView;
+    private HorizontalScrollView mHorizontalScrollView;
+    private View mLayoutTitle; // 标题栏
+    private View mLayoutLabel; // 副标题栏
+    private ImageView mBackPressed; // 标题返回键
+
     public static final String TAG = "CameraActivity";
 
     private PermissionCallback permissionCallback = new PermissionCallback() {
@@ -99,16 +111,37 @@ public class CameraActivity extends Activity {
 
         setContentView(R.layout.bd_ocr_activity_camera);
 
-        layoutTitleView = findViewById(R.id.toolbar);
+        initView();
+        initEvent();
+        mLayoutLabel = findViewById(R.id.layout_photo_shot);
+        mLayoutTitle = findViewById(R.id.toolbar);
+        mBackPressed = findViewById(R.id.iv_backPressed);
+        mBackPressed.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                CameraActivity.this.finish();
+            }
+        });
+//        takePictureContainer = (OCRCameraLayout) findViewById(R.id.take_picture_container);
+        takePictureContainer = findViewById(R.id.take_picture_container);
 
-        takePictureContainer = (OCRCameraLayout) findViewById(R.id.take_picture_container);
         confirmResultContainer = (OCRCameraLayout) findViewById(R.id.confirm_result_container);
-
         cameraView = (CameraView) findViewById(R.id.camera_view);
         cameraView.getCameraControl().setPermissionCallback(permissionCallback);
         lightButton = (ImageView) findViewById(R.id.light_button);
         lightButton.setOnClickListener(lightButtonOnClickListener);
-        takePhotoBtn = (ImageView) findViewById(R.id.take_photo_button);
+//        takePhotoBtn = (ImageView) findViewById(R.id.take_photo_button);
+
+        mHorizontalScrollView = findViewById(R.id.horizontalScrollView);
+        takePhotoBtn = (TextView) findViewById(R.id.take_photo_button);
+        TextPaint paint = takePhotoBtn.getPaint();
+        paint.setFlags(Paint.UNDERLINE_TEXT_FLAG); //下划线
+        paint.setAntiAlias(true); //抗锯齿
+        // 去除滑到尽头时的阴影
+        mHorizontalScrollView.setOverScrollMode(View.OVER_SCROLL_NEVER);
+        // 水平方向的水平滚动条是否显示
+        mHorizontalScrollView.setHorizontalScrollBarEnabled(false);
+
         findViewById(R.id.album_button).setOnClickListener(albumButtonOnClickListener);
         takePhotoBtn.setOnClickListener(takeButtonOnClickListener);
 
@@ -119,7 +152,8 @@ public class CameraActivity extends Activity {
         findViewById(R.id.rotate_button).setOnClickListener(rotateButtonOnClickListener);
 
         cropView = (CropView) findViewById(R.id.crop_view);
-        cropContainer = (OCRCameraLayout) findViewById(R.id.crop_container);
+//        cropContainer = (OCRCameraLayout) findViewById(R.id.crop_container);
+        cropContainer = findViewById(R.id.crop_container);
         overlayView = (FrameOverlayView) findViewById(R.id.overlay_view);
         cropContainer.findViewById(R.id.confirm_button).setOnClickListener(cropConfirmButtonListener);
         cropMaskView = (MaskView) cropContainer.findViewById(R.id.crop_mask_view);
@@ -131,28 +165,332 @@ public class CameraActivity extends Activity {
         cameraView.setAutoPictureCallback(autoTakePictureCallback);
     }
 
+    private TextView mTitleOne, mTitleTwo, mTitleThree; // 副标题
+    private LinearLayout mTableOne, mTableTwo, mTableThree, mTableFour, mTableFive;
+    // 下面标签
+    private TextView mTitleVin, mTitleLicense, mTitleSingle, mTitleKeys, mTitleCard;
+    private ImageView mImgVin, mImgLicense, mImgSingle, mImgKeys, mImgCard;
+    private TextView mHintText; // 提示文本信息
+    private ImageView mHintImage; // 提示图片
+    private boolean isLicenseSelect = true; // 是否是行驶证标签
+    private boolean isCardSelect; // 是否是登记证标签
 
-//    @Override
-//    public void onOptionsMenuClosed(Menu menu) {
-//        getMenuInflater().inflate(R.menu.menu, menu);
-//        super.onOptionsMenuClosed(menu);
-//    }
-//
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        switch (item.getItemId()) {
-//            case android.R.id.home:
-//
-//                break;
-//            case R.id.action_albumh:
-//
-//                break;
-//            case R.id.action_lamp:
-//
-//                break;
-//        }
-//        return super.onOptionsItemSelected(item);
-//    }
+    private void initView() {
+        mTitleOne = findViewById(R.id.tv_title_one);
+        mTitleTwo = findViewById(R.id.tv_title_two);
+        mTitleThree = findViewById(R.id.tv_title_three);
+
+        TextPaint paint1 = mTitleOne.getPaint();
+        paint1.setFlags(Paint.UNDERLINE_TEXT_FLAG); //下划线
+        paint1.setAntiAlias(true); //抗锯齿
+
+        TextPaint paint2 = mTitleTwo.getPaint();
+        paint2.setFlags(Paint.UNDERLINE_TEXT_FLAG); //下划线
+        paint2.setAntiAlias(true); //抗锯齿
+
+        TextPaint paint3 = mTitleThree.getPaint();
+        paint3.setFlags(Paint.UNDERLINE_TEXT_FLAG); //下划线
+        paint3.setAntiAlias(true); //抗锯齿
+
+        mTableOne = findViewById(R.id.ll_table_one);
+        mTableTwo = findViewById(R.id.ll_table_two);
+        mTableThree = findViewById(R.id.ll_table_three);
+        mTableFour = findViewById(R.id.ll_table_four);
+        mTableFive = findViewById(R.id.ll_table_five);
+
+        mTitleVin = findViewById(R.id.tv_table_one);
+        mTitleLicense = findViewById(R.id.tv_table_two);
+        mTitleSingle = findViewById(R.id.tv_table_three);
+        mTitleKeys = findViewById(R.id.tv_table_four);
+        mTitleCard = findViewById(R.id.tv_table_five);
+
+        mImgVin = findViewById(R.id.iv_icon_one);
+        mImgLicense = findViewById(R.id.iv_icon_two);
+        mImgSingle = findViewById(R.id.iv_icon_three);
+        mImgKeys = findViewById(R.id.iv_icon_four);
+        mImgCard = findViewById(R.id.iv_icon_five);
+
+        mHintText = findViewById(R.id.hint_take_photo);
+        mHintImage = findViewById(R.id.iv_shot_photo);
+    }
+
+    private void initEvent() {
+        mTitleOne.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setTitleTextColor(1);
+                setTitleHintImage(1);
+                setHintText(1);
+            }
+        });
+        mTitleTwo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setTitleTextColor(2);
+                setTitleHintImage(2);
+                setHintText(2);
+            }
+        });
+        mTitleThree.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setTitleTextColor(3);
+                setTitleHintImage(3);
+                setHintText(3);
+            }
+        });
+
+        mTableOne.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setTableTextColor(1);
+                setHintImage(0x1);
+                setHintText(0x10);
+            }
+        });
+
+        mTableTwo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setTableTextColor(2);
+                setHintImage(0x2);
+                setHintText(0x20);
+            }
+        });
+
+        mTableThree.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setTableTextColor(3);
+                setHintImage(0x3);
+                setHintText(0x30);
+            }
+        });
+
+        mTableFour.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setTableTextColor(4);
+                setHintImage(0x4);
+                setHintText(0x40);
+            }
+        });
+
+        mTableFive.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setTableTextColor(5);
+                setHintImage(0x5);
+                setHintText(0x50);
+            }
+        });
+    }
+
+    // 设置副标题字体颜色
+    private void setTitleTextColor(int position) {
+        if (position == 1) {
+            mTitleOne.setTextColor(getResources().getColor(R.color.colorYellow));
+            mTitleTwo.setTextColor(getResources().getColor(R.color.colorWhite));
+            mTitleThree.setTextColor(getResources().getColor(R.color.colorWhite));
+        } else if (position == 2) {
+            mTitleOne.setTextColor(getResources().getColor(R.color.colorWhite));
+            mTitleTwo.setTextColor(getResources().getColor(R.color.colorYellow));
+            mTitleThree.setTextColor(getResources().getColor(R.color.colorWhite));
+        } else if (position == 3) {
+            mTitleOne.setTextColor(getResources().getColor(R.color.colorWhite));
+            mTitleTwo.setTextColor(getResources().getColor(R.color.colorWhite));
+            mTitleThree.setTextColor(getResources().getColor(R.color.colorYellow));
+        }
+    }
+
+    // 设置标签文本更新
+    private void setTableTextColor(int position) {
+        setHintLayout(position);
+        switch (position) {
+            case 1:
+                mTitleVin.setTextColor(getResources().getColor(R.color.colorYellow));
+                mTitleLicense.setTextColor(getResources().getColor(R.color.colorWhite));
+                mTitleSingle.setTextColor(getResources().getColor(R.color.colorWhite));
+                mTitleKeys.setTextColor(getResources().getColor(R.color.colorWhite));
+                mTitleCard.setTextColor(getResources().getColor(R.color.colorWhite));
+                mImgVin.setImageResource(R.mipmap.title_vin_on);
+                mImgLicense.setImageResource(R.mipmap.title_xingshizheng_off);
+                mImgSingle.setImageResource(R.mipmap.title_baoxiandan_off);
+                mImgKeys.setImageResource(R.mipmap.title_keys_off);
+                mImgCard.setImageResource(R.mipmap.title_dengji_off);
+                break;
+            case 2:
+                mTitleVin.setTextColor(getResources().getColor(R.color.colorWhite));
+                mTitleLicense.setTextColor(getResources().getColor(R.color.colorYellow));
+                mTitleSingle.setTextColor(getResources().getColor(R.color.colorWhite));
+                mTitleKeys.setTextColor(getResources().getColor(R.color.colorWhite));
+                mTitleCard.setTextColor(getResources().getColor(R.color.colorWhite));
+                mImgVin.setImageResource(R.mipmap.title_vin_off);
+                mImgLicense.setImageResource(R.mipmap.title_xingshizheng_on);
+                mImgSingle.setImageResource(R.mipmap.title_baoxiandan_off);
+                mImgKeys.setImageResource(R.mipmap.title_keys_off);
+                mImgCard.setImageResource(R.mipmap.title_dengji_off);
+                break;
+            case 3:
+                mTitleVin.setTextColor(getResources().getColor(R.color.colorWhite));
+                mTitleLicense.setTextColor(getResources().getColor(R.color.colorWhite));
+                mTitleSingle.setTextColor(getResources().getColor(R.color.colorYellow));
+                mTitleKeys.setTextColor(getResources().getColor(R.color.colorWhite));
+                mTitleCard.setTextColor(getResources().getColor(R.color.colorWhite));
+                mImgVin.setImageResource(R.mipmap.title_vin_off);
+                mImgLicense.setImageResource(R.mipmap.title_xingshizheng_off);
+                mImgSingle.setImageResource(R.mipmap.title_baoxiandan_on);
+                mImgKeys.setImageResource(R.mipmap.title_keys_off);
+                mImgCard.setImageResource(R.mipmap.title_dengji_off);
+                break;
+            case 4:
+                mTitleVin.setTextColor(getResources().getColor(R.color.colorWhite));
+                mTitleLicense.setTextColor(getResources().getColor(R.color.colorWhite));
+                mTitleSingle.setTextColor(getResources().getColor(R.color.colorWhite));
+                mTitleKeys.setTextColor(getResources().getColor(R.color.colorYellow));
+                mTitleCard.setTextColor(getResources().getColor(R.color.colorWhite));
+                mImgVin.setImageResource(R.mipmap.title_vin_off);
+                mImgLicense.setImageResource(R.mipmap.title_xingshizheng_off);
+                mImgSingle.setImageResource(R.mipmap.title_baoxiandan_off);
+                mImgKeys.setImageResource(R.mipmap.title_keys_on);
+                mImgCard.setImageResource(R.mipmap.title_dengji_off);
+                break;
+            case 5:
+                mTitleVin.setTextColor(getResources().getColor(R.color.colorWhite));
+                mTitleLicense.setTextColor(getResources().getColor(R.color.colorWhite));
+                mTitleSingle.setTextColor(getResources().getColor(R.color.colorWhite));
+                mTitleKeys.setTextColor(getResources().getColor(R.color.colorWhite));
+                mTitleCard.setTextColor(getResources().getColor(R.color.colorYellow));
+                mImgVin.setImageResource(R.mipmap.title_vin_off);
+                mImgLicense.setImageResource(R.mipmap.title_xingshizheng_off);
+                mImgSingle.setImageResource(R.mipmap.title_baoxiandan_off);
+                mImgKeys.setImageResource(R.mipmap.title_keys_off);
+                mImgCard.setImageResource(R.mipmap.title_dengji_on);
+                break;
+            default:
+                mTitleVin.setTextColor(getResources().getColor(R.color.colorWhite));
+                mTitleLicense.setTextColor(getResources().getColor(R.color.colorYellow));
+                mTitleSingle.setTextColor(getResources().getColor(R.color.colorWhite));
+                mTitleKeys.setTextColor(getResources().getColor(R.color.colorWhite));
+                mTitleCard.setTextColor(getResources().getColor(R.color.colorWhite));
+                mImgVin.setImageResource(R.mipmap.title_vin_off);
+                mImgLicense.setImageResource(R.mipmap.title_xingshizheng_on);
+                mImgSingle.setImageResource(R.mipmap.title_baoxiandan_off);
+                mImgKeys.setImageResource(R.mipmap.title_keys_off);
+                mImgCard.setImageResource(R.mipmap.title_dengji_off);
+                break;
+        }
+    }
+
+    // 设置副标题布局显示
+    private void setHintLayout(int position) {
+        if (position == 2) {
+            mLayoutLabel.setVisibility(View.VISIBLE);
+            mTitleOne.setText("行驶证主页");
+            mTitleTwo.setText("行驶证副页");
+            mTitleThree.setText("行驶证主页背面");
+        } else if (position == 5) {
+            mLayoutLabel.setVisibility(View.VISIBLE);
+            mTitleOne.setText("登记证第1页");
+            mTitleTwo.setText("登记证第2页");
+            mTitleThree.setText("登记证最后页");
+        } else {
+            mLayoutLabel.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    // 设置提示图片
+    private void setHintImage(int position) {
+        switch (position) {
+            case 0x1:
+                isLicenseSelect = false;
+                isCardSelect = false;
+                mHintImage.setVisibility(View.VISIBLE);
+                mHintImage.setImageResource(R.mipmap.vin);
+                break;
+            case 0x2:
+                isLicenseSelect = true;
+                isCardSelect = false;
+                mHintImage.setVisibility(View.VISIBLE);
+                break;
+            case 0x3:
+                isLicenseSelect = false;
+                isCardSelect = false;
+                mHintImage.setVisibility(View.VISIBLE);
+                mHintImage.setImageResource(R.mipmap.baoxiandan);
+                break;
+            case 0x4:
+                isLicenseSelect = false;
+                isCardSelect = false;
+                mHintImage.setVisibility(View.VISIBLE);
+                mHintImage.setImageResource(R.mipmap.car_keys);
+                break;
+            case 0x5:
+                isLicenseSelect = false;
+                isCardSelect = true;
+                mHintImage.setVisibility(View.VISIBLE);
+                break;
+        }
+    }
+
+    private void setTitleHintImage(int position) {
+        if (isLicenseSelect && !isCardSelect) {
+            if (position == 1) {
+                mHintImage.setImageResource(R.mipmap.xingshizheng);
+            } else if (position == 2) {
+                mHintImage.setImageResource(R.mipmap.xingshizheng_fu);
+            } else if (position == 3) {
+                mHintImage.setImageResource(R.mipmap.xingshizheng_bei);
+            }
+        }
+
+        if (!isLicenseSelect && isCardSelect) {
+            if (position == 1) {
+                mHintImage.setImageResource(R.mipmap.car_dengji_1);
+            } else if (position == 2) {
+                mHintImage.setImageResource(R.mipmap.car_dengji_2);
+            } else if (position == 3) {
+                mHintImage.setImageResource(R.mipmap.car_dengji_3);
+            }
+        }
+    }
+
+    // 设置提示文本
+    private void setHintText(int position) {
+        String hintMsg = null;
+        switch (position) {
+            case 0x10:
+                hintMsg = "";
+                break;
+            case 1:
+                hintMsg = "请对准行驶证主页进行拍照";
+                break;
+            case 2:
+                hintMsg = "请对准行驶证副页进行拍照";
+                break;
+            case 3:
+                hintMsg = "请对准行驶证主页背面进行拍照";
+                break;
+            case 0x20:
+                hintMsg = "请对准行驶证主页进行拍照";
+                break;
+            case 0x30:
+                hintMsg = "请对准保险单进行拍照";
+                break;
+            case 0x40:
+                hintMsg = "请对准车钥匙进行拍照";
+                break;
+            case 0x50:
+                hintMsg = "请对准车辆登记证进行拍照";
+                break;
+            default:
+                hintMsg = "";
+                break;
+        }
+
+        mHintText.setText(hintMsg);
+    }
+
 
     @Override
     protected void onStart() {
@@ -255,7 +593,7 @@ public class CameraActivity extends Activity {
         confirmResultContainer.setVisibility(View.INVISIBLE);
         cropContainer.setVisibility(View.INVISIBLE);
 
-        layoutTitleView.setVisibility(View.VISIBLE);
+        mLayoutTitle.setVisibility(View.VISIBLE);
 
         Log.e(TAG, "showTakePicture()");
     }
@@ -267,7 +605,7 @@ public class CameraActivity extends Activity {
         confirmResultContainer.setVisibility(View.INVISIBLE);
         cropContainer.setVisibility(View.VISIBLE);
 
-        layoutTitleView.setVisibility(View.INVISIBLE);
+        mLayoutTitle.setVisibility(View.INVISIBLE);
 
         Log.e(TAG, "showCrop()");
     }
@@ -279,7 +617,7 @@ public class CameraActivity extends Activity {
         confirmResultContainer.setVisibility(View.VISIBLE);
         cropContainer.setVisibility(View.INVISIBLE);
 
-        layoutTitleView.setVisibility(View.INVISIBLE);
+        mLayoutTitle.setVisibility(View.INVISIBLE);
         Log.e(TAG, "showResultConfirm()");
     }
 
@@ -287,9 +625,9 @@ public class CameraActivity extends Activity {
     private void updateFlashMode() {
         int flashMode = cameraView.getCameraControl().getFlashMode();
         if (flashMode == ICameraControl.FLASH_MODE_TORCH) {
-            lightButton.setImageResource(R.drawable.bd_ocr_light_on);
+            lightButton.setImageResource(R.mipmap.bd_ocr_light_on);
         } else {
-            lightButton.setImageResource(R.drawable.bd_ocr_light_off);
+            lightButton.setImageResource(R.mipmap.bd_ocr_light_off);
         }
     }
 
@@ -406,6 +744,7 @@ public class CameraActivity extends Activity {
             }
             Bitmap cropped = cropView.crop(rect);
             displayImageView.setImageBitmap(cropped);
+            ImageUtils.getInstance().setBitmap(cropped); // 保存剪裁后的图片
             cropAndConfirm();
         }
     };
@@ -505,7 +844,7 @@ public class CameraActivity extends Activity {
                 cameraView.setOrientation(CameraView.ORIENTATION_PORTRAIT);
                 break;
         }
-        takePictureContainer.setOrientation(orientation);
+//        takePictureContainer.setOrientation(orientation);
         cameraView.setOrientation(cameraViewOrientation);
         cropContainer.setOrientation(orientation);
         confirmResultContainer.setOrientation(orientation);
